@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Shop</title>
+    <link href="/webjars/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .product-card {
+            border: none;
+            border-radius: 15px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            overflow: hidden;
+        }
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15) !important;
+        }
+        .product-img {
+            height: 200px;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+        .product-card:hover .product-img {
+            transform: scale(1.05);
+        }
+        .category-link {
+            display: block;
+            padding: 8px 12px;
+            border-radius: 8px;
+            text-decoration: none;
+            color: #495057;
+            transition: all 0.2s ease;
+        }
+        .category-link:hover {
+            background: #0d6efd;
+            color: white;
+        }
+        .sidebar-card {
+            border: none;
+            border-radius: 15px;
+        }
+        .price-tag {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #28a745;
+        }
+    </style>
+</head>
+<body class="bg-light">
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="/">🛒 MyShop</a>
+        <button class="navbar-toggler" type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto align-items-center">
+                <li class="nav-item">
+                    <a class="nav-link" href="/order/my-orders">📦 My Orders</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/cart">🛒 Cart</a>
+                </li>
+                <li class="nav-item" th:if="${isAdmin}">
+                    <a class="btn btn-warning ms-2" href="/admin">⚙️ Admin</a>
+                </li>
+                <li class="nav-item">
+                    <a class="btn btn-outline-danger ms-2" href="/logout">Logout</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Page Header -->
+<div class="bg-dark text-white py-4 mb-4">
+    <div class="container">
+        <h2 class="mb-0 fw-bold">🛍️ Our Products</h2>
+        <p class="mb-0 opacity-75">Discover our amazing collection</p>
+    </div>
+</div>
+
+<div class="container mb-5">
+    <div class="row">
+
+        <!-- Sidebar -->
+        <div class="col-md-3">
+
+            <!-- Categories -->
+            <div class="card sidebar-card shadow-sm mb-3">
+                <div class="card-body">
+                    <h6 class="fw-bold text-uppercase text-muted mb-3">
+                        📂 Categories
+                    </h6>
+                    <a href="/shop" class="category-link">
+                        🏠 All Products
+                    </a>
+                    <a th:each="cat : ${categories}"
+                       th:href="@{/shop/category/{id}(id=${cat.id})}"
+                       th:text="${cat.name}"
+                       class="category-link">
+                    </a>
+                </div>
+            </div>
+
+            <!-- Search -->
+            <div class="card sidebar-card shadow-sm">
+                <div class="card-body">
+                    <h6 class="fw-bold text-uppercase text-muted mb-3">
+                        🔍 Search
+                    </h6>
+                    <form th:action="@{/shop/search}" method="get">
+                        <div class="input-group">
+                            <input type="text" name="keyword"
+                                   class="form-control"
+                                   th:value="${keyword}"
+                                   placeholder="Search...">
+                            <button class="btn btn-primary"
+                                    type="submit">🔍</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Products Grid -->
+        <div class="col-md-9">
+
+            <!-- Search result info -->
+            <div th:if="${keyword}" class="alert alert-info mb-3">
+                Search results for: <strong th:text="${keyword}"></strong>
+            </div>
+
+            <!-- No products -->
+            <div th:if="${#lists.isEmpty(products)}"
+                 class="text-center py-5">
+                <div class="fs-1">😕</div>
+                <h4>No products found!

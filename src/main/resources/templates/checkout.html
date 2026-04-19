@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Checkout</title>
+    <link href="/webjars/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+<!-- Navbar -->
+<nav class="navbar navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" href="/">🛒 My eCommerce Store</a>
+        <div class="d-flex">
+            <a href="/logout" class="btn btn-outline-danger">Logout</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+    <h3>Checkout</h3>
+    <div class="row">
+
+        <!-- Order Summary -->
+        <div class="col-md-7">
+            <div class="card shadow-sm mb-3">
+                <div class="card-body">
+                    <h5>Order Summary</h5>
+                    <hr>
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Qty</th>
+                            <th>Subtotal</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="item : ${cartItems}">
+                            <td th:text="${item.productName}"></td>
+                            <td th:text="${item.quantity}"></td>
+                            <td th:text="'$' + ${item.subtotal}"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <hr>
+                    <div class="d-flex justify-content-between">
+                        <strong>Total:</strong>
+                        <strong class="text-success"
+                                th:text="'$' + ${total}"></strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Shipping Form -->
+        <div class="col-md-5">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5>Shipping Details</h5>
+                    <hr>
+                    <form th:action="@{/order/place}" method="post">
+                        <div class="mb-3">
+                            <label>Full Name</label>
+                            <input type="text" class="form-control"
+                                   th:value="${user.name}" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label>Email</label>
+                            <input type="text" class="form-control"
+                                   th:value="${user.email}" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label>Shipping Address</label>
+                            <textarea name="shippingAddress"
+                                      class="form-control"
+                                      rows="3"
+                                      required
+                                      th:text="${user.address}"></textarea>
+                        </div>
+                        <button type="submit"
+                                class="btn btn-success w-100">
+                            ✅ Place Order
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+</body>
+</html>

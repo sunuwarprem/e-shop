@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Admin - Orders</title>
+    <link href="/webjars/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+<nav class="navbar navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" href="/admin">⚙️ Admin Panel</a>
+        <div class="d-flex">
+            <a href="/admin/products" class="btn btn-outline-light me-2">Products</a>
+            <a href="/admin/orders" class="btn btn-outline-light me-2">Orders</a>
+            <a href="/shop" class="btn btn-outline-light me-2">Shop</a>
+            <a href="/logout" class="btn btn-outline-danger">Logout</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+    <h3>🧾 All Orders</h3>
+    <hr>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <table class="table table-hover">
+                <thead class="table-dark">
+                <tr>
+                    <th>Order #</th>
+                    <th>Customer</th>
+                    <th>Date</th>
+                    <th>Total</th>
+                    <th>Status</th>
+                    <th>Update Status</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="order : ${orders}">
+                    <td th:text="${order.id}"></td>
+                    <td th:text="${order.user.name}"></td>
+                    <td th:text="${#temporals.format(order.createdAt,
+                                'dd MMM yyyy')}"></td>
+                    <td th:text="'$' + ${order.totalAmount}"></td>
+                    <td>
+                            <span th:text="${order.status}"
+                                  class="badge"
+                                  th:classappend="${order.status == 'PENDING'} ?
+                                        'bg-warning' :
+                                        (${order.status == 'DELIVERED'} ?
+                                        'bg-success' : 'bg-info')">
+                            </span>
+                    </td>
+                    <td>
+                        <form th:action="@{/admin/orders/update/{id}
+                                    (id=${order.id})}" method="post">
+                            <div class="input-group input-group-sm">
+                                <select name="status" class="form-select">
+                                    <option value="PENDING">PENDING</option>
+                                    <option value="PROCESSING">PROCESSING</option>
+                                    <option value="SHIPPED">SHIPPED</option>
+                                    <option value="DELIVERED">DELIVERED</option>
+                                    <option value="CANCELLED">CANCELLED</option>
+                                </select>
+                                <button class="btn btn-primary"
+                                        type="submit">Update</button>
+                            </div>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+</html>

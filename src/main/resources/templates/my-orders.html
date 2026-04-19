@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>My Orders</title>
+    <link href="/webjars/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+<!-- Navbar -->
+<nav class="navbar navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" href="/">🛒 My eCommerce Store</a>
+        <div class="d-flex">
+            <a href="/shop" class="btn btn-outline-light me-2">Shop</a>
+            <a href="/logout" class="btn btn-outline-danger">Logout</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+    <h3>📦 My Orders</h3>
+    <hr>
+
+    <!-- No Orders -->
+    <div th:if="${#lists.isEmpty(orders)}" class="alert alert-info">
+        You have no orders yet!
+        <a href="/shop">Start Shopping</a>
+    </div>
+
+    <!-- Orders List -->
+    <div th:each="order : ${orders}" class="card shadow-sm mb-3">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-3">
+                    <strong>Order #</strong>
+                    <span th:text="${order.id}"></span>
+                </div>
+                <div class="col-md-3">
+                    <strong>Date:</strong>
+                    <span th:text="${#temporals.format(order.createdAt,
+                            'dd MMM yyyy')}"></span>
+                </div>
+                <div class="col-md-3">
+                    <strong>Total:</strong>
+                    <span class="text-success"
+                          th:text="'$' + ${order.totalAmount}"></span>
+                </div>
+                <div class="col-md-3">
+                    <span th:text="${order.status}"
+                          class="badge"
+                          th:classappend="${order.status == 'PENDING'} ?
+                                'bg-warning' :
+                                (${order.status == 'DELIVERED'} ?
+                                'bg-success' : 'bg-info')">
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
