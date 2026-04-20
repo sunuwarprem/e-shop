@@ -54,7 +54,15 @@
                 </a>
                 <form th:action="@{/cart/add/{id}(id=${product.id})}"
                       method="post" style="display:inline">
-                    <input type="hidden" name="quantity" value="1">
+                    <div class="mb-3">
+                        <label>Quantity:</label>
+                        <input type="number"
+                               name="quantity"
+                               value="1"
+                               min="1"
+                               th:max="${product.stock}"
+                               class="form-control w-25 d-inline">
+                    </div>
                     <button type="submit"
                             class="btn btn-primary"
                             th:disabled="${product.stock == 0}">

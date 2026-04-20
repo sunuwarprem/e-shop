@@ -1,7 +1,6 @@
 package com.prem.ecommerce.controller;
 
 import com.prem.ecommerce.model.CartItem;
-import com.prem.ecommerce.model.Product;
 import com.prem.ecommerce.service.CartService;
 import com.prem.ecommerce.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,11 +54,19 @@ public class CartController {
 
     @PostMapping("/update/{productId}")
     public String updateQuantity(@PathVariable Long productId,
-                                 @RequestParam int quantity) {
+                                 @RequestParam int quantity,
+                                 Model model) {
         if (quantity <= 0) {
             cartService.removeFromCart(productId);
         } else {
-            cartService.updateQuantity(productId, quantity);
+            // Check stock before updating
+            productService.getProductById(productId).ifPresent(product -> {
+                if (quantity <= product.getStock()) {
+                    cartService.updateQuantity(productId, quantity);
+                } else {
+                    cartService.updateQuantity(productId, product.getStock());
+                }
+            });
         }
         return "redirect:/cart";
     }

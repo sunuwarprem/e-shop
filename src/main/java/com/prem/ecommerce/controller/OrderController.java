@@ -5,6 +5,7 @@ import com.prem.ecommerce.model.OrderItem;
 import com.prem.ecommerce.model.User;
 import com.prem.ecommerce.service.CartService;
 import com.prem.ecommerce.service.OrderService;
+import com.prem.ecommerce.service.ProductService;
 import com.prem.ecommerce.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -24,6 +25,8 @@ import java.util.stream.Collectors;
 @Controller
 @RequestMapping("/order")
 public class OrderController {
+    @Autowired
+    private ProductService productService;
 
     @Autowired
     private OrderService orderService;
@@ -63,6 +66,16 @@ public class OrderController {
                     item.setOrder(order);
                     item.setQuantity(cartItem.getQuantity());
                     item.setPrice(BigDecimal.valueOf(cartItem.getPrice()));
+
+                    // Reduce stock — capture quantity in local variable
+                    int orderedQty = cartItem.getQuantity();
+                    productService.getProductById(cartItem.getProductId())
+                            .ifPresent(product -> {
+                                int newStock = product.getStock() - orderedQty;
+                                product.setStock(Math.max(newStock, 0));
+                                productService.saveProduct(product);
+                            });
+
                     return item;
                 }).collect(Collectors.toList());
 

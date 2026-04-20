@@ -17,10 +17,6 @@
         .product-img {
             height: 200px;
             object-fit: cover;
-            transition: transform 0.3s ease;
-        }
-        .product-card:hover .product-img {
-            transform: scale(1.05);
         }
         .category-link {
             display: block;
@@ -33,10 +29,6 @@
         .category-link:hover {
             background: #0d6efd;
             color: white;
-        }
-        .sidebar-card {
-            border: none;
-            border-radius: 15px;
         }
         .price-tag {
             font-size: 1.2rem;
@@ -58,6 +50,11 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto align-items-center">
+               <li class="nav-item">
+                <span class="navbar-text text-white me-3">
+            👤 <span th:text="${loggedInUser}"></span>
+                 </span>
+               </li>
                 <li class="nav-item">
                     <a class="nav-link" href="/order/my-orders">📦 My Orders</a>
                 </li>
@@ -88,16 +85,12 @@
 
         <!-- Sidebar -->
         <div class="col-md-3">
-
-            <!-- Categories -->
-            <div class="card sidebar-card shadow-sm mb-3">
+            <div class="card shadow-sm mb-3" style="border:none; border-radius:15px;">
                 <div class="card-body">
                     <h6 class="fw-bold text-uppercase text-muted mb-3">
                         📂 Categories
                     </h6>
-                    <a href="/shop" class="category-link">
-                        🏠 All Products
-                    </a>
+                    <a href="/shop" class="category-link">🏠 All Products</a>
                     <a th:each="cat : ${categories}"
                        th:href="@{/shop/category/{id}(id=${cat.id})}"
                        th:text="${cat.name}"
@@ -105,9 +98,7 @@
                     </a>
                 </div>
             </div>
-
-            <!-- Search -->
-            <div class="card sidebar-card shadow-sm">
+            <div class="card shadow-sm" style="border:none; border-radius:15px;">
                 <div class="card-body">
                     <h6 class="fw-bold text-uppercase text-muted mb-3">
                         🔍 Search
@@ -118,8 +109,7 @@
                                    class="form-control"
                                    th:value="${keyword}"
                                    placeholder="Search...">
-                            <button class="btn btn-primary"
-                                    type="submit">🔍</button>
+                            <button class="btn btn-primary" type="submit">🔍</button>
                         </div>
                     </form>
                 </div>
@@ -128,14 +118,47 @@
 
         <!-- Products Grid -->
         <div class="col-md-9">
-
-            <!-- Search result info -->
             <div th:if="${keyword}" class="alert alert-info mb-3">
                 Search results for: <strong th:text="${keyword}"></strong>
             </div>
-
-            <!-- No products -->
-            <div th:if="${#lists.isEmpty(products)}"
+            <div th:if="${products == null or #lists.isEmpty(products)}"
                  class="text-center py-5">
                 <div class="fs-1">😕</div>
-                <h4>No products found!
+                <h4>No products found!</h4>
+                <a href="/shop" class="btn btn-primary mt-2">View All Products</a>
+            </div>
+            <div class="row g-4">
+                <div th:each="product : ${products}" class="col-md-4">
+                    <div class="card product-card shadow-sm h-100">
+                        <div style="overflow:hidden;">
+                            <img th:src="${product.imageUrl}"
+                                 class="product-img w-100"
+                                 onerror="this.src='https://via.placeholder.com/300x200'">
+                        </div>
+                        <div class="card-body">
+                            <h6 class="fw-bold" th:text="${product.name}"></h6>
+                            <p class="price-tag" th:text="'$' + ${product.price}"></p>
+                            <p class="text-muted small" th:text="${product.description}"></p>
+                        </div>
+                        <div class="card-footer bg-white border-0 pb-3">
+                            <a th:href="@{/shop/product/{id}(id=${product.id})}"
+                               class="btn btn-primary w-100">
+                                View Details →
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer class="bg-dark text-white py-3 mt-4">
+    <div class="container text-center">
+        <p class="mb-0 opacity-75">© 2026 MyShop. Built with Spring Boot ❤️</p>
+    </div>
+</footer>
+
+<script src="/webjars/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

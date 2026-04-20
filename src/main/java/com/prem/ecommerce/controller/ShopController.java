@@ -21,31 +21,40 @@ public class ShopController {
     @Autowired
     private CategoryService categoryService;
 
-    @GetMapping
-    public String shopHome(Model model, Authentication authentication) {
-        model.addAttribute("products", productService.getAllProducts());
-        model.addAttribute("categories", categoryService.getAllCategories());
+    private void addAdminAttribute(Model model, Authentication authentication) {
         if (authentication != null) {
             boolean isAdmin = authentication.getAuthorities().stream()
                     .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
             model.addAttribute("isAdmin", isAdmin);
+            model.addAttribute("loggedInUser", authentication.getName());
         }
+    }
+
+    @GetMapping
+    public String shopHome(Model model, Authentication authentication) {
+        model.addAttribute("products", productService.getAllProducts());
+        model.addAttribute("categories", categoryService.getAllCategories());
+        addAdminAttribute(model, authentication);
         return "shop";
     }
 
     @GetMapping("/search")
-    public String searchProducts(@RequestParam String keyword, Model model) {
+    public String searchProducts(@RequestParam String keyword, Model model,
+                                 Authentication authentication) {
         model.addAttribute("products", productService.searchProducts(keyword));
         model.addAttribute("categories", categoryService.getAllCategories());
         model.addAttribute("keyword", keyword);
+        addAdminAttribute(model, authentication);
         return "shop";
     }
 
     @GetMapping("/category/{id}")
-    public String filterByCategory(@PathVariable Long id, Model model) {
+    public String filterByCategory(@PathVariable Long id, Model model,
+                                   Authentication authentication) {
         model.addAttribute("products", productService.getProductsByCategory(id));
         model.addAttribute("categories", categoryService.getAllCategories());
         model.addAttribute("selectedCategory", id);
+        addAdminAttribute(model, authentication);
         return "shop";
     }
 

@@ -30,14 +30,16 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/", "/shop/**", "/register", "/login",
-                                "/webjars/**", "/css/**", "/js/**", "/images/**").permitAll()
+                                "/webjars/**", "/css/**", "/js/**", "/images/**",
+                                "/uploads/**").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/cart/**", "/order/**").authenticated()
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
                         .loginPage("/login")
                         .loginProcessingUrl("/login")
-                        .defaultSuccessUrl("/", true)
+                        .defaultSuccessUrl("/shop", true)
                         .failureUrl("/login?error=true")
                         .permitAll()
                 )

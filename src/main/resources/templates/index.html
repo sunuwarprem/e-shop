@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>My eCommerce Store</title>
+    <title>MyShop — Shop Smart</title>
     <link href="/webjars/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
     <style>
         .hero-section {
@@ -19,13 +19,23 @@
             font-size: 1.2rem;
             color: #a0aec0;
         }
-        .feature-card {
+        .product-card {
             border: none;
             border-radius: 15px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            overflow: hidden;
+        }
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15) !important;
+        }
+        .product-img {
+            height: 200px;
+            object-fit: cover;
             transition: transform 0.3s ease;
         }
-        .feature-card:hover {
-            transform: translateY(-5px);
+        .product-card:hover .product-img {
+            transform: scale(1.05);
         }
         .category-card {
             border-radius: 15px;
@@ -36,9 +46,19 @@
         .category-card:hover {
             transform: scale(1.03);
         }
+        .price-tag {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #28a745;
+        }
         footer {
             background: #1a1a2e;
             color: #a0aec0;
+        }
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-15px); }
+            60% { transform: translateY(-8px); }
         }
     </style>
 </head>
@@ -47,30 +67,24 @@
 <!-- Navbar -->
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
-        <a class="navbar-brand fw-bold" href="/">
-            🛒 MyShop
-        </a>
+        <a class="navbar-brand fw-bold" href="/">🛒 MyShop</a>
         <button class="navbar-toggler" type="button"
                 data-bs-toggle="collapse"
                 data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ms-auto">
+            <ul class="navbar-nav ms-auto align-items-center">
                 <li class="nav-item">
                     <a class="nav-link" href="/shop">Shop</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/cart">🛒 Cart</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/order/my-orders">📦 My Orders</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="/login">Login</a>
                 </li>
                 <li class="nav-item">
-                    <a class="btn btn-primary ms-2" href="/register">Register</a>
+                    <a class="btn btn-primary ms-2" href="/register">
+                        Register
+                    </a>
                 </li>
             </ul>
         </div>
@@ -93,35 +107,44 @@
         <a href="/register" class="btn btn-outline-light btn-lg px-5 py-3">
             Join Free
         </a>
+        <!-- Scroll Down Arrow -->
+        <div class="mt-5">
+            <a href="#features" class="text-white text-decoration-none">
+                <div style="animation: bounce 2s infinite;">
+                    <div style="font-size: 2rem;">↓</div>
+                    <div style="font-size: 0.9rem; opacity: 0.7;">Scroll Down</div>
+                </div>
+            </a>
+        </div>
     </div>
 </div>
 
 <!-- Features Section -->
-<div class="container mt-5">
+<div class="container mt-5" id="features">
     <div class="row g-4">
         <div class="col-md-3">
-            <div class="card feature-card shadow-sm text-center p-4">
+            <div class="card shadow-sm text-center p-4 border-0 rounded-4">
                 <div class="fs-1 mb-3">🚚</div>
                 <h5>Free Delivery</h5>
                 <p class="text-muted small">On orders above $50</p>
             </div>
         </div>
         <div class="col-md-3">
-            <div class="card feature-card shadow-sm text-center p-4">
+            <div class="card shadow-sm text-center p-4 border-0 rounded-4">
                 <div class="fs-1 mb-3">🔒</div>
                 <h5>Secure Payment</h5>
                 <p class="text-muted small">100% secure transactions</p>
             </div>
         </div>
         <div class="col-md-3">
-            <div class="card feature-card shadow-sm text-center p-4">
+            <div class="card shadow-sm text-center p-4 border-0 rounded-4">
                 <div class="fs-1 mb-3">↩️</div>
                 <h5>Easy Returns</h5>
                 <p class="text-muted small">30 day return policy</p>
             </div>
         </div>
         <div class="col-md-3">
-            <div class="card feature-card shadow-sm text-center p-4">
+            <div class="card shadow-sm text-center p-4 border-0 rounded-4">
                 <div class="fs-1 mb-3">🎧</div>
                 <h5>24/7 Support</h5>
                 <p class="text-muted small">Always here to help</p>
@@ -134,32 +157,57 @@
 <div class="container mt-5">
     <h2 class="fw-bold mb-4">Shop by Category</h2>
     <div class="row g-4">
-        <div class="col-md-4">
-            <a href="/shop/category/1" class="text-decoration-none">
-                <div class="category-card bg-primary text-white p-5 text-center">
-                    <div class="fs-1 mb-2">📱</div>
-                    <h4>Electronics</h4>
-                    <p class="mb-0 opacity-75">Phones, TVs, Laptops</p>
+        <div class="col-md-3" th:each="cat, iter : ${categories}">
+            <a th:href="@{/shop/category/{id}(id=${cat.id})}"
+               class="text-decoration-none">
+                <div class="category-card p-4 text-center text-white"
+                     th:style="${iter.index % 4 == 0} ? 'background:#0d6efd; border-radius:15px' :
+                       (${iter.index % 4 == 1} ? 'background:#198754; border-radius:15px' :
+                       (${iter.index % 4 == 2} ? 'background:#ffc107; border-radius:15px' :
+                       'background:#dc3545; border-radius:15px'))">
+                    <div class="fs-1 mb-2"
+                         th:text="${cat.name == 'Electronics'} ? '📱' :
+                          (${cat.name == 'Clothing'} ? '👕' :
+                          (${cat.name == 'Books'} ? '📚' :
+                          (${cat.name == 'Music'} ? '🎵' : '🛍️')))">
+                    </div>
+                    <h4 th:text="${cat.name}"></h4>
+                    <p class="mb-0 opacity-75"
+                       th:text="${cat.description}"></p>
                 </div>
             </a>
         </div>
-        <div class="col-md-4">
-            <a href="/shop/category/2" class="text-decoration-none">
-                <div class="category-card bg-success text-white p-5 text-center">
-                    <div class="fs-1 mb-2">👕</div>
-                    <h4>Clothing</h4>
-                    <p class="mb-0 opacity-75">T-shirts, Jeans, Shoes</p>
+    </div>
+</div>
+
+<!-- Featured Products -->
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold">Featured Products</h2>
+        <a href="/shop" class="btn btn-outline-primary">View All →</a>
+    </div>
+    <div class="row g-4">
+        <div th:each="product, iter : ${products}"
+             th:if="${iter.index < 6}"
+             class="col-md-4">
+            <div class="card product-card shadow-sm h-100">
+                <div style="overflow:hidden;">
+                    <img th:src="${product.imageUrl}"
+                         class="product-img w-100"
+                         onerror="this.src='https://via.placeholder.com/300x200'">
                 </div>
-            </a>
-        </div>
-        <div class="col-md-4">
-            <a href="/shop/category/3" class="text-decoration-none">
-                <div class="category-card bg-warning text-white p-5 text-center">
-                    <div class="fs-1 mb-2">📚</div>
-                    <h4>Books</h4>
-                    <p class="mb-0 opacity-75">Programming, Fiction</p>
+                <div class="card-body">
+                    <h6 class="fw-bold" th:text="${product.name}"></h6>
+                    <p class="price-tag" th:text="'$' + ${product.price}"></p>
+                    <p class="text-muted small" th:text="${product.description}"></p>
                 </div>
-            </a>
+                <div class="card-footer bg-white border-0 pb-3">
+                    <a th:href="@{/shop/product/{id}(id=${product.id})}"
+                       class="btn btn-primary w-100">
+                        View Details →
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -168,7 +216,7 @@
 <footer class="mt-5 py-4">
     <div class="container text-center">
         <p class="mb-1">🛒 MyShop — Your one stop shop</p>
-        <p class="small mb-0">© 2026 MyShop. Built with Spring Boot & ❤️</p>
+        <p class="small mb-0">© 2026 MyShop. Built with Spring Boot ❤️</p>
     </div>
 </footer>
 
